@@ -13,6 +13,11 @@ class WeatherScreen extends StatefulWidget {
 
 class _WeatherScreenState extends State<WeatherScreen> {
   final TextEditingController controller = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    context.read<WeatherCubit>().loadCounties();
+  }
 
   @override
   void dispose() {

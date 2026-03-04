@@ -1,30 +1,34 @@
 import 'package:hive/hive.dart';
 
-/*// part 'weather_data.g.dart';*/
+part 'weather_data.g.dart';
 
 @HiveType(typeId: 0)
-class WeatherData {
+class WeatherData extends HiveObject {
   @HiveField(0)
-  final double temperature;
+  final String city;
 
   @HiveField(1)
-  final String description;
+  final double temperature;
 
   @HiveField(2)
-  final String timestamp;
+  final String description;
+
+  @HiveField(3)
+  final int humidity;
 
   WeatherData({
+    required this.city,
     required this.temperature,
     required this.description,
-    required this.timestamp,
+    required this.humidity,
   });
 
-  // factory constructor to convert json from api into weatherdata
   factory WeatherData.fromJson(Map<String, dynamic> json) {
     return WeatherData(
-      temperature: json['main']['temp'].toDouble(),
-      description: json['weather'][0]['description'],
-      timestamp: DateTime.now().toString(),
+      city: json['name'] ?? '',
+      temperature: (json['main']['temp'] as num).toDouble(),
+      description: json['weather'][0]['description'] ?? '',
+      humidity: json['main']['humidity'] ?? 0,
     );
   }
 }

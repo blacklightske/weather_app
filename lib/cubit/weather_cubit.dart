@@ -2,10 +2,18 @@ import 'package:cubit_weather_app/cubit/weather_state.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../models/weather_data.dart';
 import '../repository/weather_repository.dart';
 
 class WeatherCubit extends Cubit<WeatherState> {
   final WeatherRepository repository;
+  final List<String> counties = [
+    'Nairobi',
+    'Mombasa',
+    'Kisumu',
+    'Nakuru',
+    'Eldoret',
+  ];
 
   CancelToken? _cancelToken; // ✅ track current request
 
@@ -39,6 +47,35 @@ class WeatherCubit extends Cubit<WeatherState> {
         state.copyWith(status: WeatherStatus.error, errorMessage: e.toString()),
       );
     }
+  }
+
+  Future<void> loadCounties() async {
+    emit(state.copyWith(status: WeatherStatus.loading, errorMessage: null));
+
+    final List<WeatherData> results = [];
+
+    for (final city in counties) {
+      try {
+        // 1) try cache
+        final cached = repository.getCachedCity(city);
+        if (cached != null) {
+          results.add(cached);
+          continue;
+        }
+
+        // 2) fetch if missing
+        final fresh = await repository.getWeather(city);
+
+        // 3) cache it
+        await repository.cacheWeather(fresh);
+
+        results.add(fresh);
+      } catch (_) {
+        // ✅ ignore failures for this city only
+      }
+    }
+
+    emit(state.copyWith(status: WeatherStatus.loaded, items: results));
   }
 
   @override
