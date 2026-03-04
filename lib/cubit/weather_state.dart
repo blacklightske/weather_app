@@ -18,12 +18,13 @@ class WeatherState {
   WeatherState copyWith({
     WeatherStatus? status,
     WeatherData? data,
+    bool clearData = false,
     List<WeatherData>? items, // NEW
     String? errorMessage,
   }) {
     return WeatherState(
       status: status ?? this.status,
-      data: data ?? this.data,
+      data: clearData ? null : (data ?? this.data),
       items: items ?? this.items, // NEW
       errorMessage: errorMessage ?? this.errorMessage,
     );

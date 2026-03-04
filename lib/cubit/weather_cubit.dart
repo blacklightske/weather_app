@@ -82,7 +82,7 @@ class WeatherCubit extends Cubit<WeatherState> {
     emit(
       state.copyWith(
         status: WeatherStatus.loaded,
-        data: null,
+        clearData: true,
         // keep items as-is
       ),
     );
