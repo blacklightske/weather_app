@@ -78,6 +78,16 @@ class WeatherCubit extends Cubit<WeatherState> {
     emit(state.copyWith(status: WeatherStatus.loaded, items: results));
   }
 
+  void showCounties() {
+    emit(
+      state.copyWith(
+        status: WeatherStatus.loaded,
+        data: null,
+        // keep items as-is
+      ),
+    );
+  }
+
   @override
   Future<void> close() {
     _cancelToken?.cancel('Cubit closed');

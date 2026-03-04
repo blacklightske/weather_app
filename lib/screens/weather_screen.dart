@@ -61,6 +61,18 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
             const SizedBox(height: 32),
 
+            ElevatedButton(
+              onPressed: () {
+                final city = controller.text.trim();
+                if (city.isNotEmpty) {
+                  context.read<WeatherCubit>().showCounties();
+                }
+              },
+              child: Text('Back to counties'),
+            ),
+
+            const SizedBox(height: 32),
+
             // ✅ Result area (loading / loaded / error / initial)
             BlocBuilder<WeatherCubit, WeatherState>(
               builder: (context, state) {
@@ -69,14 +81,30 @@ class _WeatherScreenState extends State<WeatherScreen> {
                 }
 
                 if (state.status == WeatherStatus.loaded) {
-                  return Column(
-                    children: [
-                      Text(
-                        '${state.data!.temperature} °C',
-                        style: const TextStyle(fontSize: 24),
-                      ),
-                      Text(state.data!.description),
-                    ],
+                  if (state.data != null) {
+                    return Column(
+                      children: [
+                        Text(
+                          '${state.data!.temperature} °C',
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                        Text(state.data!.description),
+                      ],
+                    );
+                  }
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: state.items.length,
+                      itemBuilder: (context, index) {
+                        final item = state.items[index];
+
+                        return ListTile(
+                          title: Text(item.city),
+                          subtitle: Text(item.description),
+                          trailing: Text('${item.temperature} °C'),
+                        );
+                      },
+                    ),
                   );
                 }
 
