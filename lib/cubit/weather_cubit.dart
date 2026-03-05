@@ -88,6 +88,23 @@ class WeatherCubit extends Cubit<WeatherState> {
     );
   }
 
+  Future<void> refreshCity(String city) async {
+    // TODO
+    final fresh = await repository.getWeather(city);
+    await repository.cacheWeather(fresh);
+    final updated = List<WeatherData>.from(state.items);
+    final index = updated.indexWhere(
+      (item) => item.city.toLowerCase() == city.toLowerCase(),
+    );
+    if (index == -1) {
+      updated.add(fresh);
+      print('not found ');
+    } else {
+      updated[index] = fresh;
+    }
+    emit(state.copyWith(status: WeatherStatus.loaded, items: updated));
+  }
+
   @override
   Future<void> close() {
     _cancelToken?.cancel('Cubit closed');
