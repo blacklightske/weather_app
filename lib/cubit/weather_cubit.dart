@@ -89,7 +89,6 @@ class WeatherCubit extends Cubit<WeatherState> {
   }
 
   Future<void> refreshCity(String city) async {
-    // TODO
     final fresh = await repository.getWeather(city);
     await repository.cacheWeather(fresh);
     final updated = List<WeatherData>.from(state.items);
