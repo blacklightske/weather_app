@@ -64,9 +64,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
             ElevatedButton(
               onPressed: () {
                 final city = controller.text.trim();
-                if (city.isNotEmpty) {
-                  context.read<WeatherCubit>().showCounties();
-                }
+
+                context.read<WeatherCubit>().showCounties();
               },
               child: Text('Back to counties'),
             ),
@@ -84,6 +83,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   if (state.data != null) {
                     return Column(
                       children: [
+                        Text(state.data!.city),
                         Text(
                           '${state.data!.temperature} °C',
                           style: const TextStyle(fontSize: 24),
@@ -99,6 +99,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
                         final item = state.items[index];
 
                         return ListTile(
+                          onTap: () => context
+                              .read<WeatherCubit>()
+                              .fetchWeather(item.city),
                           title: Text(item.city),
                           subtitle: Text(item.description),
                           trailing: Text('${item.temperature} °C'),
