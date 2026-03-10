@@ -4,9 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../models/weather_data.dart';
 import '../repository/weather_repository.dart';
+import '../services/app_preferences.dart';
 
 class WeatherCubit extends Cubit<WeatherState> {
   final WeatherRepository repository;
+  final AppPreferences preferences;
   final List<String> counties = [
     'Nairobi',
     'Mombasa',
@@ -17,9 +19,11 @@ class WeatherCubit extends Cubit<WeatherState> {
 
   CancelToken? _cancelToken; // ✅ track current request
 
-  WeatherCubit({required this.repository}) : super(const WeatherState());
+  WeatherCubit({required this.repository, required this.preferences})
+    : super(const WeatherState());
 
   Future<void> fetchWeather(String city) async {
+    await preferences.saveLastCity(city);
     // ✅ Cancel previous request (if any)
     _cancelToken?.cancel('New search started');
     _cancelToken = CancelToken();
@@ -33,6 +37,7 @@ class WeatherCubit extends Cubit<WeatherState> {
       );
 
       await repository.cacheWeather(weather);
+
       final updated = List<WeatherData>.from(state.items);
       final index = updated.indexWhere(
         (item) => item.city.toLowerCase() == city.toLowerCase(),
@@ -119,6 +124,14 @@ class WeatherCubit extends Cubit<WeatherState> {
       updated[index] = fresh;
     }
     emit(state.copyWith(status: WeatherStatus.loaded, items: updated));
+  }
+
+  Future<void> loadLastCity() async {
+    final city = await preferences.getLastCity();
+
+    if (city != null) {
+      await fetchWeather(city);
+    }
   }
 
   @override
