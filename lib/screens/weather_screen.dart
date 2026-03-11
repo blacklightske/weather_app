@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubit/weather_cubit.dart';
 import '../cubit/weather_state.dart';
+import '../theme/theme_cubit.dart';
+import '../theme/theme_state.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
@@ -28,7 +30,22 @@ class _WeatherScreenState extends State<WeatherScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Weather App')),
+      appBar: AppBar(
+        title: const Text('Weather App'),
+        actions: [
+          BlocBuilder<ThemeCubit, ThemeState>(
+            builder: (context, state) {
+              return Switch(
+                value: state.isDarkMode,
+                onChanged: (_) {
+                  context.read<ThemeCubit>().toggleTheme();
+                },
+              );
+            },
+          ),
+        ],
+      ),
+
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
